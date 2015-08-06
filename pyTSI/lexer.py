@@ -19,6 +19,8 @@ tokens = (
     'VALUE',
     'NEWLINES',
     'IN_MODE',
+    'COMMENT',
+    'COMMENT_TEXT',
 )
 
 t_TSINFO = r'treestructinfo'
@@ -33,11 +35,17 @@ t_REF_ATTR = r'ref\s{1}attr'
 t_REF_NODE = r'ref\s{1}node'
 t_END_REF_NODE = r'end\s{1}ref\s{1}node'
 t_IN_MODE = r'in\s{1}mode'
+t_COMMENT = r'::'
 
 def t_NEWLINES(t):
     r'\n\s*'
     count = t.value.count('\n')
     t.lexer.lineno += count
+    return t
+
+def t_COMMENT_TEXT(t):
+    r'(?<=::)(.+?)(?=\n)'
+    t.value = t.value.strip()
     return t
 
 def t_ATTR_NAME(t):
@@ -66,7 +74,6 @@ def t_VALUE(t):
     t.value = t.value[1:-1]  # cut the quotes
     return t
 
-t_ignore_COMMENT = r'::.*'
 t_ignore_WHITESPACE = r'[ \t]'
 
 lexer = lex.lex(debug=True)

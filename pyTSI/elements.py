@@ -3,6 +3,7 @@ class Attr:
         self.name = name
         self.value = value
 
+
 class Node:
     def __init__(self, name, elements=None, ref=False, link_file_name=None):
         self.name = name
