@@ -1,10 +1,10 @@
 import unittest
-import pyTSI.lexer as lexer
+from pyTSI.lexer import Lexer
 
 
 class TestLexer(unittest.TestCase):
     def test_empty_tree(self):
-        tokens = lexer.tokenize('treestructinfo "2.0"\nend tree')
+        tokens = Lexer().tokenize('treestructinfo "2.0"\nend tree')
         self.assertEqual(tokens[0].type, 'TSINFO')
         self.assertEqual(tokens[1].type, 'VALUE')
         self.assertEqual(tokens[1].value, '2.0')
@@ -12,7 +12,7 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tokens[3].type, 'END_TREE')
 
     def test_tree_with_some_attrs(self):
-        tokens = lexer.tokenize('treestructinfo "2.0"\nattr Some Attr "Some Value"\nattr Some Other Attr ""\nend tree')
+        tokens = Lexer().tokenize('treestructinfo "2.0"\nattr Some Attr "Some Value"\nattr Some Other Attr ""\nend tree')
         self.assertEqual(tokens[3].type, 'ATTR')
         self.assertEqual(tokens[4].type, 'ATTR_NAME')
         self.assertEqual(tokens[4].value, 'Some Attr')
@@ -21,7 +21,7 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tokens[9].value, '')
 
     def test_tree_with_ref_node(self):
-        tokens = lexer.tokenize('treestructinfo "2.0"\nref node Some Node\nend tree\n'
+        tokens = Lexer().tokenize('treestructinfo "2.0"\nref node Some Node\nend tree\n'
                                 'ref node Some Node\nattr Some Attr "Foo"\nend ref node')
         self.assertEqual(tokens[3].type, 'REF_NODE')
         self.assertEqual(tokens[4].type, 'REF_NODE_NAME')
@@ -34,7 +34,7 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tokens[15].type, 'END_REF_NODE')
 
     def test_empty_tree_with_comment(self):
-        tokens = lexer.tokenize(''':: Main tree
+        tokens = Lexer().tokenize(''':: Main tree
                                    :: comment
                                    treestructinfo "2.0"
                                    end tree''')
@@ -48,7 +48,7 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tokens[5].type, 'NEWLINES')
 
     def test_simple_tree_with_comments(self):
-        tokens = lexer.tokenize('''treestructinfo "2.0"
+        tokens = Lexer().tokenize('''treestructinfo "2.0"
                                      :: Multiline
                                      :: attr comment
                                      attr Foo "Bar"
@@ -64,4 +64,15 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tokens[7].value, 'attr comment')
         self.assertEqual(tokens[17].value, 'Comment')
         self.assertEqual(tokens[20].value, 'inside of node')
+
+    def test_with_linked_tree(self):
+        tokens = Lexer().tokenize('''treestructinfo "2.0"
+                                     tree "foo.tsinfo" as node "Bar"
+                                   end tree''')
+        self.assertEqual(tokens[3].type, 'TREE')
+        self.assertEqual(tokens[4].value, 'foo.tsinfo')
+        self.assertEqual(tokens[5].type, 'AS_NODE')
+        self.assertEqual(tokens[6].type, 'VALUE')
+        self.assertEqual(tokens[6].value, 'Bar')
+        self.assertEqual(tokens[7].type, 'NEWLINES')
 

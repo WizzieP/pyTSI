@@ -8,13 +8,13 @@ class Node:
     def __init__(self, name, elements=None, ref=False, link_file_name=None):
         self.name = name
         if elements is None:
-            self._elements = []
+            self.elements = []
         else:
-            self._elements = elements
+            self.elements = elements
         self.link_file_name = link_file_name
 
     def get(self, name):
-        for element in self._elements:
+        for element in self.elements:
             if element.name == name:
                 return element
         else:

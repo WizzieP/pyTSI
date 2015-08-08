@@ -1,0 +1,3 @@
+treestructinfo "2.0"
+  attr Foo "Bar"
+end tree
