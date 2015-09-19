@@ -75,3 +75,26 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(tree.elements[0].name, 'Linked Node')
         self.assertEqual(tree.elements[0].elements[0].name, 'Foo')
         self.assertEqual(tree.elements[0].elements[0].value, 'Bar')
+
+
+    def test_with_tree_comment(self):
+        tree = Parser().parse(''':: Main Comment
+                                 ::
+                                 :: Foo
+                                 treestructinfo "2.0"
+                                 end tree''')
+        self.assertEqual(tree.comment, 'Main Comment\n\nFoo')
+
+    def test_with_some_basic_comments(self):
+        tree = tree = Parser().parse('''
+                                 treestructinfo "2.0"
+                                   ::
+                                   :: Foo
+                                   ::
+                                   node Foo
+                                     ::
+                                     attr Bar "Bar"
+                                   end node
+                                 end tree''')
+        self.assertEqual(tree.elements[0].comment, '\nFoo\n')
+        self.assertEqual(tree.elements[0].elements[0].comment, '\n')
